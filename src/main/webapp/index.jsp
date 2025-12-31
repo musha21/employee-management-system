@@ -143,13 +143,30 @@
 
 
     function saveEmploee() {
+        const nic = saveNic.value.trim();
+        const name = saveName.value.trim();
+        const age = saveAge.value.trim();
+        const salary = saveSalary.value.trim();
+
+        // 1. Check empty fields
+        if (!nic || !name || !age || !salary) {
+            alert("Please fill all fields");
+            return;
+        }
+
+        // 2. Check duplicate NIC in current table
+        if (window.displayedEmployees?.some(emp => emp.nic === nic)) {
+            alert("NIC already exists! Please use a different NIC.");
+            return;
+        }
+
         const emp = {
-            nic: saveNic.value,
-            name: saveName.value,
-            age: parseInt(saveAge.value),
-            salary: parseFloat(saveSalary.value)
+            nic: nic,
+            name: name,
+            age: parseInt(age),
+            salary: parseFloat(salary)
         };
-        console.log(emp);
+
         fetch('http://localhost:8080/demoEE_war_exploded/employee', {
             method: 'POST',
             body: JSON.stringify(emp),
@@ -157,9 +174,19 @@
                 'Content-type': 'application/json; charset=UTF-8',
             },
         })
-            .then((response) => response.json())
-            .then((json) => console.log(json));
+            .then(res => {
+                if (res.status === 409) throw new Error("NIC already exists");
+                if (!res.ok) throw new Error("Save failed");
+                return res.json();
+            })
+            .then(() => {
+                loadAllEmployees();
+            clearForm();
+                alert("Employee saved successfully");
+            })
+            .catch(err => alert(err.message));
     }
+
 
     let employees = [];
 
@@ -191,9 +218,9 @@
                     Update
                 </button>
                 <button class="btn btn-danger btn-sm"
-                        onclick="deleteEmployee('${emp.nic}')">
+                        onclick="deleteEmployee('\${emp.nic}')">
                     Delete
-                </button>
+                   </button>
             </td>
         </tr>`;
         });
@@ -267,13 +294,26 @@
                 ).hide();
             });
     }
+    function deleteEmployee(nic) {
+        console.log("Deleting NIC:", nic);
+
+        if (!confirm("Are you sure you want to delete this employee?")) return;
+
+        fetch("http://localhost:8080/demoEE_war_exploded/employee?nic=" + nic, {
+            method: "DELETE"
+        })
+            .then(res => {
+                if (!res.ok) throw new Error("Delete failed");
+            })
+            .then(() => loadAllEmployees());
+    }
 
 
     function clearForm() {
-        document.getElementById("nic").value = "";
-        document.getElementById("name").value = "";
-        document.getElementById("age").value = "";
-        document.getElementById("salary").value = "";
+        document.getElementById("saveNic").value = "";
+        document.getElementById("saveName").value = "";
+        document.getElementById("saveAge").value = "";
+        document.getElementById("saveSalary").value = "";
     }
 
 </script>

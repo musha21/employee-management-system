@@ -44,7 +44,21 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     @Override
     public boolean deleteEmployee(String nic) {
-        return false;
+        try {
+            Connection connection = DBConnection.getDbConnection().getConnection();
+
+            PreparedStatement stm = connection.prepareStatement(
+                    "DELETE FROM employee WHERE empNic=?"
+            );
+
+            stm.setString(1, nic);
+
+            return stm.executeUpdate() > 0;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 
     @Override

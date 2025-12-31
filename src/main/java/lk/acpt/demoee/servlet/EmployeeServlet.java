@@ -77,6 +77,14 @@ else {
 
     @Override
     protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        super.doDelete(req, resp);
+        String nic = req.getParameter("nic");
+
+        boolean deleted = employeeService.deleteEmployee(nic);
+
+        if (deleted) {
+            resp.setStatus(HttpServletResponse.SC_OK);
+        } else {
+            resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+        }
     }
 }
