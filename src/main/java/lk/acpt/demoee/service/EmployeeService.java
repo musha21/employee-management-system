@@ -9,5 +9,7 @@ public interface EmployeeService {
     boolean deleteEmployee(String nic);
     List<EmployeeDto> getAllEmployee();
     EmployeeDto searchEmployee(String nic);
-    EmployeeDto updateEmployee(EmployeeDto employeeDto);
+    boolean updateEmployee(EmployeeDto employeeDto);
+
+
 }

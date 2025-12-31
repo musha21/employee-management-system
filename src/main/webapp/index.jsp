@@ -202,12 +202,7 @@
         window.displayedEmployees = data;
 
 
-
-
-
-
     }
-
 
 
     function searchEmployee() {
@@ -257,7 +252,6 @@
             age: parseInt(document.getElementById("updateAge").value),
             salary: parseFloat(document.getElementById("updateSalary").value)
         };
-
         fetch("http://localhost:8080/demoEE_war_exploded/employee", {
             method: "PUT",
             headers: { "Content-Type": "application/json" },
@@ -265,18 +259,14 @@
         })
             .then(res => {
                 if (!res.ok) throw new Error("Update failed");
-                return res.json();
             })
             .then(() => loadAllEmployees())
             .finally(() => {
-                selectedEmployee = null; // reset
                 bootstrap.Modal.getInstance(
                     document.getElementById("updateModal")
                 ).hide();
             });
     }
-
-
 
 
     function clearForm() {

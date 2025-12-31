@@ -10,6 +10,7 @@ import lk.acpt.demoee.dto.EmployeeDto;
 import lk.acpt.demoee.service.EmployeeService;
 import lk.acpt.demoee.service.ipml.EmployeeServiceImpl;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.List;
 
@@ -55,26 +56,22 @@ else {
     }
 
     @Override
-    protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        String nic = req.getParameter("nic");
+    protected void doPut(HttpServletRequest req, HttpServletResponse resp)
+            throws ServletException, IOException {
 
-        if (nic == null || nic.isEmpty()) {
-            List<EmployeeDto> allEmployee = employeeService.getAllEmployee();
-            String json = gson.toJson(allEmployee);
-            resp.getWriter().write(json);
+        // Convert JSON → Java object
+        Gson gson = new Gson();
+        EmployeeDto employeeDto =
+                gson.fromJson(req.getReader(), EmployeeDto.class);
+
+        // Call service
+        boolean updated = employeeService.updateEmployee(employeeDto);
+
+        // Send response status
+        if (updated) {
+            resp.setStatus(HttpServletResponse.SC_OK);
         } else {
-            // Optional: normalize NIC to upper case to avoid case mismatch
-            nic = nic.trim().toUpperCase();
-
-            EmployeeDto employeeDto = employeeService.searchEmployee(nic);
-
-            if (employeeDto != null) {
-                String json = gson.toJson(employeeDto);
-                resp.getWriter().write(json);
-            } else {
-                resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
-                resp.getWriter().write("{}"); // send empty JSON instead of plain text
-            }
+            resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
         }
     }
 
